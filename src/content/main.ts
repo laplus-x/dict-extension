@@ -10,8 +10,8 @@ document.body.appendChild(popup);
 const shadow = popup.attachShadow({ mode: "open" });
 
 const btn = document.createElement("div");
-btn.style.width = "32px";
-btn.style.height = "32px";
+btn.style.width = "36px";
+btn.style.height = "36px";
 btn.style.borderRadius = "50%";
 btn.style.color = "#fff";
 btn.style.background = "#343a40";
