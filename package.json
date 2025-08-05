@@ -20,7 +20,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "release": "VERSION=$(node -p \"require('./package.json').version\") && git tag -a v$VERSION -m \"Release version v$VERSION\" && git push origin v$VERSION"
   },
   "dependencies": {
     "autobind-decorator": "^2.4.0",
