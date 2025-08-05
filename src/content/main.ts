@@ -5,7 +5,7 @@ const popup = document.createElement("div");
 popup.id = "dict-ext-popup";
 popup.style.position = "absolute";
 popup.style.zIndex = "2147483647";
-document.body.appendChild(popup);
+document.documentElement.appendChild(popup);
 
 const shadow = popup.attachShadow({ mode: "open" });
 
