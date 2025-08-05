@@ -53,7 +53,7 @@ export const SearchForm = ({ value, onChange }: SearchFormProps) => {
             autoComplete="off"
           />
           {word && (
-            <button type="button" onClick={() => setWord("")}>
+            <button type="button" className="cursor-pointer" onClick={() => setWord("")}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-white"

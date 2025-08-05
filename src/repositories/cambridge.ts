@@ -4,6 +4,7 @@ import { CacheManager } from './cache';
 
 
 export interface DictType {
+    link: string;
     pron: Record<string, {
         ipa: string;
         audio: string;
@@ -83,6 +84,8 @@ export class Cambridge {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
 
+        const link = document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.content || "";
+
         const pron = {
             uk: {
                 ipa:
@@ -119,6 +122,7 @@ export class Cambridge {
             pos.push(data)
         })
         return {
+            link,
             pron,
             pos,
         };

@@ -48,13 +48,13 @@ const DictTabs = ({ items, activeTab, onTabClick }: DictTabsProps) => {
           )}
         </div>
       )}
-      <div className="h-full sticky top-0">
+      <div className="pt-2 h-full sticky top-0">
         <div className="flex flex-col gap-2">
           {items.map((_, idx) => (
             <button
               key={idx}
               onClick={() => onTabClick(idx)}
-              className={`size-8 text-sm font-medium rounded-full ${
+              className={`size-8 text-sm font-medium rounded-full cursor-pointer ${
                 activeTab === idx
                   ? "bg-amber-600 text-white"
                   : "bg-neutral-300 text-neutral-700"
@@ -87,8 +87,19 @@ const DictPron = ({ data }: DictPronProps) => {
             <div key={key} className="flex items-center gap-2">
               <span className="text-sm uppercase">{key}</span>
               {value.audio && (
-                <button className="" onClick={() => playAudio(value.audio)}>
-                  🔊
+                <button
+                  className="cursor-pointer"
+                  onClick={() => playAudio(value.audio)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5 text-amber-600"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M3 9v6h4l5 5V4L7 9H3z" />
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05A4.495 4.495 0 0016.5 12z" />
+                  </svg>
                 </button>
               )}
               <span className="text-sm font-medium">{value.ipa}</span>
@@ -134,7 +145,27 @@ export const Dict = ({ text }: DictProps) => {
       )}
       {!loading && result && result.ok && (
         <>
-          <DictPron data={result.val.pron} />
+          <div className="flex justify-between w-full">
+            <DictPron data={result.val.pron} />
+            <a href={result.val.link} target="_blank" rel="noopener noreferrer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18 13v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h6"
+                />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          </div>
           <DictTabs
             activeTab={activeTab}
             items={result.val.pos}
