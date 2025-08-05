@@ -7,6 +7,8 @@ export const App = () => {
   const [text, setText] = useState<string>("");
 
   useEffect(() => {
+    const port = chrome.runtime.connect({ name: "popup" });
+
     const handle = (msg: Record<string, any>) => {
       console.log("Received message:", msg);
       if (msg.type === "QUERY") {
@@ -16,8 +18,10 @@ export const App = () => {
       }
     };
 
+    port.onMessage.addListener(handle);
     chrome.runtime.onMessage.addListener(handle);
     return () => {
+      port.onMessage.removeListener(handle);
       chrome.runtime.onMessage.removeListener(handle);
     };
   }, []);
