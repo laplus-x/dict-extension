@@ -1,8 +1,6 @@
-import { useAsync, useDebounce } from "@/components";
+import { useAsync, useDebounce, useInstance } from "@/components";
 import { Cambridge } from "@/repositories";
 import { useEffect, useState, type FormEventHandler } from "react";
-
-const cambridge = Cambridge.getInstance();
 
 interface SearchFormProps {
   value: string;
@@ -10,6 +8,7 @@ interface SearchFormProps {
 }
 
 export const SearchForm = ({ value, onChange }: SearchFormProps) => {
+  const cambridge = useInstance(Cambridge);
   const { loading, result, run } = useAsync(cambridge.autocomplete);
 
   const [focusing, setFocusing] = useState<boolean>(false);
@@ -45,15 +44,22 @@ export const SearchForm = ({ value, onChange }: SearchFormProps) => {
             placeholder="Enter a text to search"
             value={word}
             onChange={(e) => {
-              setWord(e.target.value);
               debounceAutocomplete(e.target.value);
+              setWord(e.target.value);
             }}
-            onFocus={() => setFocusing(true)}
+            onFocus={() => {
+              run(word);
+              setFocusing(true)
+            }}
             onBlur={() => setFocusing(false)}
             autoComplete="off"
           />
           {word && (
-            <button type="button" className="cursor-pointer" onClick={() => setWord("")}>
+            <button
+              type="button"
+              className="cursor-pointer"
+              onClick={() => setWord("")}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-white"
