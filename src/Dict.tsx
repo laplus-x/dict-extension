@@ -108,7 +108,7 @@ const DictPron = ({ data }: DictPronProps) => {
       {Object.entries(data).map(
         ([key, value]) =>
           value.ipa && (
-            <div key={key} className="flex items-center gap-2">
+            <div key={key} className="flex flex-wrap items-center gap-2">
               <span className="text-sm uppercase">{key}</span>
               {value.audio && (
                 <button
