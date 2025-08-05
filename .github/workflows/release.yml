@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # 讀取版本號，存到 env
       - name: Get version from package.json
         id: get_version
@@ -26,7 +26,7 @@ jobs:
 
       # 上傳 Release 並附加指定檔案
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: release/crx-${{ env.NAME }}-${{ env.VERSION }}.zip
           body: |
