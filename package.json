@@ -3,6 +3,19 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": {
+    "name": "Margo Chen",
+    "email": "laplus.space@gmail.com",
+    "url": "https://laplus-x.github.io/laplus-x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laplus-x/dict-extension.git"
+  },
+  "engines": {
+    "node": ">=18.0.0 <21.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
