@@ -1,8 +1,32 @@
-import { useAsync } from "@/components";
+import { useAsync, useInstance } from "@/components";
 import { Cambridge, type DictType } from "@/repositories";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type HTMLAttributes,
+} from "react";
 
-const cambridge = Cambridge.getInstance();
+interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
+  lines?: number;
+}
+
+export const Skeleton = ({ lines = 8, className, ...props }: SkeletonProps) => {
+  return (
+    <div {...props} className={`space-y-2 ${className}`}>
+      {Array.from({ length: lines }).map((_, i) => (
+        <div
+          key={i}
+          className="h-5 bg-gray-300 rounded animate-pulse"
+          style={{
+            width: i === lines - 1 ? "60%" : "100%",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 interface DictTabsProps {
   items: DictType["pos"];
@@ -115,6 +139,7 @@ interface DictProps {
 }
 
 export const Dict = ({ text }: DictProps) => {
+  const cambridge = useInstance(Cambridge);
   const { loading, result, run } = useAsync(cambridge.query);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -139,7 +164,7 @@ export const Dict = ({ text }: DictProps) => {
       className="p-4 overflow-y-auto"
       style={{ maxHeight: "calc(100svh - 50px)" }}
     >
-      {loading && <p>Loading...</p>}
+      {loading && <Skeleton />}
       {!loading && result && !result.ok && (
         <p className="text-red-500">{result.val.message}</p>
       )}
