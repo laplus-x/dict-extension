@@ -1,11 +1,11 @@
 import { useRef } from "react";
 
 type Constructor<T = any> = {
-    new(): T;
-    getInstance?: () => T;
+    new (...args: any[]): T;
+    getInstance?: (...args: any[]) => T;
 };
 
-export const useInstance = <T>(cls: Constructor<T>) => {
-    const ref = useRef(cls.getInstance?.() ?? new cls())
+export const useInstance = <T>(cls: Constructor<T>, ...args: any[]) => {
+    const ref = useRef(cls.getInstance?.(...args) ?? new cls(...args))
     return ref.current
 }

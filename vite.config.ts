@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { crx } from '@crxjs/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
@@ -16,6 +17,12 @@ export default defineConfig({
     crx({ manifest }),
     zip({ outDir: 'release', outFileName: `crx-${name}-${version}.zip` }),
   ],
+  test: {
+    globals: true,
+    environment: "happy-dom",
+    include: ['./src/**/*.{test,spec}.{js,ts}{,x}'],
+    setupFiles: ['./vitest.setup.ts']
+  },
   server: {
     cors: {
       origin: [

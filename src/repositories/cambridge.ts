@@ -31,7 +31,7 @@ export interface AutocompleteType {
     beta: boolean;
 }
 
-interface CambridgeOptions {
+export interface CambridgeOptions {
     dict: string
 }
 

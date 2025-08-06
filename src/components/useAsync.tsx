@@ -1,4 +1,4 @@
-import { type ArgsFunc, type Async } from "@/types";
+import type { ArgsFunc, Async } from "@/types";
 import { Functions } from "@/utilities";
 import { useRef, useState } from "react";
 

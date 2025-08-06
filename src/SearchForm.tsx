@@ -2,7 +2,7 @@ import { useAsync, useDebounce, useInstance } from "@/components";
 import { Cambridge } from "@/repositories";
 import { useEffect, useState, type FormEventHandler } from "react";
 
-interface SearchFormProps {
+export interface SearchFormProps {
   value: string;
   onChange: (value: string) => void;
 }

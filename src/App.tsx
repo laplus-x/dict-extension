@@ -1,6 +1,6 @@
 import { Dict } from "@/Dict";
 import { useEffect, useState } from "react";
-import { SearchForm } from "./Form";
+import { SearchForm } from "./SearchForm";
 
 export const App = () => {
   const [visible, setVisible] = useState<boolean>(false);

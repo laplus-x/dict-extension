@@ -4,12 +4,13 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["chrome"],
+    "types": ["chrome", "vitest/globals", "@testing-library/jest-dom"],
 
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false
   },
+  "include": ["./vitest-setup.ts"],
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
