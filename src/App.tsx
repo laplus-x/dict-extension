@@ -1,5 +1,5 @@
-import { Dict } from "@/Dict";
 import { useEffect, useState } from "react";
+import { Dict } from "./Dict";
 import { SearchForm } from "./SearchForm";
 
 export const App = () => {

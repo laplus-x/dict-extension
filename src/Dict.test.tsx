@@ -11,7 +11,6 @@ vi.mock("@/repositories", () => ({
   Cambridge: vi.fn(() => mock<Cambridge>()),
 }));
 
-// mock custom hooks
 const { useAsyncMock } = vi.hoisted(() => {
   return {
     useAsyncMock: vi.fn(),
@@ -49,29 +48,38 @@ describe("Dict", () => {
     vi.clearAllMocks();
   });
 
-  it("displays Skeleton when loading=true", () => {
+  it("displays a Skeleton while data is loading", () => {
+    // Given the dictionary is loading
     useAsyncMock.mockReturnValue({
       loading: true,
       result: null,
       run: vi.fn(),
     });
 
+    // When rendering the Dict component
     render(<Dict text="test" />);
+
+    // Then a Skeleton should be displayed
     expect(screen.getByTestId("skeleton")).toBeInTheDocument();
   });
 
-  it("displays error message when result.ok=false", async () => {
+  it("displays an error message when the lookup fails", async () => {
+    // Given the dictionary returns an error
     useAsyncMock.mockReturnValue({
       loading: false,
       result: Err(new Error("Not Found")),
       run: vi.fn(),
     });
 
+    // When rendering the Dict component
     render(<Dict text="fail" />);
+
+    // Then the error message should be visible
     expect(screen.getByText("Not Found")).toBeInTheDocument();
   });
 
-  it("displays DictPron and DictTabs when query succeeds", async () => {
+  it("renders DictPron and DictTabs when the lookup succeeds", async () => {
+    // Given the dictionary returns valid results
     useAsyncMock.mockReturnValue({
       loading: false,
       result: Ok({
@@ -82,32 +90,40 @@ describe("Dict", () => {
       run: vi.fn(),
     });
 
+    // When rendering the Dict component
     render(<Dict text="hello" />);
 
+    // Then DictPron and DictTabs should be displayed
     expect(screen.getByTestId("dict-pron")).toBeInTheDocument();
     expect(screen.getByTestId("dict-tabs")).toHaveTextContent("noun,verb");
 
+    // And the link should point to the source
     expect(screen.getByRole("link")).toHaveAttribute(
       "href",
       "https://example.com"
     );
   });
 
-  it("calls run when text is provided", async () => {
-    const runMock = vi.fn()
+  it("calls run with the provided text", async () => {
+    // Given a run function mock
+    const runMock = vi.fn();
     useAsyncMock.mockReturnValue({
       loading: false,
       result: null,
       run: runMock,
     });
 
+    // When rendering Dict with a search text
     render(<Dict text="apple" />);
+
+    // Then run should be called with that text
     await waitFor(() => {
       expect(runMock).toHaveBeenCalledWith("apple");
     });
   });
 
   it("triggers handleTabClick when a tab is clicked", async () => {
+    // Given the dictionary returns a result with one tab
     useAsyncMock.mockReturnValue({
       loading: false,
       result: Ok({
@@ -118,8 +134,11 @@ describe("Dict", () => {
       run: vi.fn(),
     });
 
+    // When the user clicks a tab
     render(<Dict text="big" />);
     fireEvent.click(screen.getByText("Switch Tab"));
+
+    // Then the tab click handler should be triggered
     expect(screen.getByTestId("dict-tabs")).toBeInTheDocument();
   });
 });
