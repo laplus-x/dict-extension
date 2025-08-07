@@ -1,5 +1,6 @@
 import type { Cambridge } from "@/repositories";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { Ok } from "ts-results";
 import { describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 import { SearchForm } from "./SearchForm";
@@ -14,7 +15,7 @@ vi.mock("@/components", async (importActual) => {
     ...actual,
     useAsync: (fn: any) => ({
       loading: false,
-      result: { ok: true, val: [{ word: "mockedWord" }] },
+      result: Ok([{ word: "mockedWord" }]),
       run: vi.fn(fn),
     }),
     useDebounce: (cb: any) => cb,
