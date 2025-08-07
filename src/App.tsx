@@ -27,7 +27,7 @@ export const App = () => {
   }, []);
 
   return (
-    <div className="font-sans w-[400px] h-[300px] bg-[#343a40] text-white">
+    <div className="font-sans min-w-[400px] min-h-[300px] w-full h-svh bg-[#343a40] text-white overflow-hidden">
       <SearchForm value={text} onChange={setText} />
       <Dict text={visible ? text : ""} />
     </div>

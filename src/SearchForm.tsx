@@ -79,7 +79,7 @@ export const SearchForm = ({ value, onChange }: SearchFormProps) => {
         </div>
       </form>
       {focusing && !loading && result && result.ok && (
-        <div className="absolute z-10 w-full bg-white text-black rounded-b shadow max-h-30 overflow-y-auto">
+        <div className="absolute z-10 w-full bg-white text-black rounded-b shadow max-h-[50%] overflow-y-auto">
           {result.val.map((i) => (
             <button
               key={i.word}

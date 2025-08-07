@@ -84,7 +84,7 @@ export class Cambridge {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
 
-        const link = document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.content || "";
+        const link = doc.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.content || this.BASE;
 
         const pron = {
             uk: {
@@ -121,6 +121,7 @@ export class Cambridge {
             const data = this.parsePos(ele)
             pos.push(data)
         })
+
         return {
             link,
             pron,
