@@ -19,12 +19,22 @@ export default defineManifest({
   },
   content_scripts: [{
     js: ['src/content/main.ts'],
-    matches: ['https://*/*'],
+    matches: [
+      "http://*/*",
+      "https://*/*",
+      "http://localhost/*",
+      "http://127.0.0.1/*",
+    ],
   }],
   web_accessible_resources: [
     {
       resources: ["index.html"],
-      matches: ['https://*/*'],
+      matches: [
+        "http://*/*",
+        "https://*/*",
+        "http://localhost/*",
+        "http://127.0.0.1/*"
+      ],
     }
   ],
   permissions: ["storage", "scripting"],
