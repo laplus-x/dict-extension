@@ -5,6 +5,7 @@ const popup = document.createElement("div");
 popup.id = "dict-ext-popup";
 popup.style.position = "absolute";
 popup.style.zIndex = "2147483647";
+popup.style.display = "none";
 document.documentElement.appendChild(popup);
 
 const shadow = popup.attachShadow({ mode: "open" });
@@ -41,15 +42,7 @@ iframe.style.borderRadius = "8px";
 iframe.style.display = "none";
 shadow.appendChild(iframe);
 
-btn.onclick = () => {
-  btn.style.display = "none";
-  iframe.style.display = "block";
-
-  const rect = popup.getBoundingClientRect();
-  const margin = 5;
-  const width = 450;
-  const height = 350;
-
+function getPopupBounds(rect: DOMRect, width: number, height: number, margin: number) {
   let left = rect.left + window.scrollX;
   let top = rect.bottom + window.scrollY + margin;
 
@@ -72,6 +65,20 @@ btn.onclick = () => {
   if (top < margin + window.scrollY) {
     top = rect.bottom + window.scrollY + margin; // fallback
   }
+
+  return { left, top };
+}
+
+btn.onclick = () => {
+  btn.style.display = "none";
+  iframe.style.display = "block";
+
+  const rect = popup.getBoundingClientRect();
+  const margin = 5;
+  const width = 450;
+  const height = 350;
+
+  const { left, top } = getPopupBounds(rect, width, height, margin);
 
   popup.style.left = `${left}px`;
   popup.style.top = `${top}px`;
@@ -98,12 +105,14 @@ document.addEventListener("mouseup", (e) => {
   const range = selection.getRangeAt(0);
   const rect = range.getBoundingClientRect();
   const margin = 5;
+  const width = 36;
+  const height = 36;
 
-  const left = rect.left + window.scrollX;
-  const top = rect.bottom + window.scrollY + margin;
+  const { left, top } = getPopupBounds(rect, width, height, margin);
 
   popup.style.left = `${left}px`;
   popup.style.top = `${top}px`;
+
   popup.style.display = "block";
 
   chrome.runtime.sendMessage({ type: "QUERY", text });
