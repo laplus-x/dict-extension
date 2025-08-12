@@ -139,7 +139,10 @@ export class Cambridge {
         const resp = await fetch(
             `${this.BASE}/zht/autocomplete/amp?dataset=${this.options.dict}&q=${word}`
         )
-        const result = resp.json()
+        if (!resp.ok) {
+            throw new Error(`HTTP error! Status: ${resp.status} - ${resp.statusText}`);
+        }
+        const result = await resp.json()
         this.cacheManager.set(word, result, { prefix })
         return result
     }
@@ -155,6 +158,9 @@ export class Cambridge {
         const resp = await fetch(
             `${this.BASE}/dictionary/${this.options.dict}/${word}`
         )
+        if (!resp.ok) {
+            throw new Error(`HTTP error! Status: ${resp.status} - ${resp.statusText}`);
+        }
         const html = await resp.text();
         const result = this.parse(html);
         this.cacheManager.set<DictType>(word, result, { prefix })
