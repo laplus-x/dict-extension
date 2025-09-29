@@ -1,5 +1,6 @@
 import { useAsync, useDebounce, useInstance } from "@/components";
 import { Cambridge } from "@/repositories";
+import { Dictionary } from "@/usecases";
 import { useEffect, useState, type FormEventHandler } from "react";
 
 export interface SearchFormProps {
@@ -8,8 +9,8 @@ export interface SearchFormProps {
 }
 
 export const SearchForm = ({ value, onChange }: SearchFormProps) => {
-  const cambridge = useInstance(Cambridge);
-  const { loading, result, run } = useAsync(cambridge.autocomplete);
+  const dictionary = useInstance(Dictionary, Cambridge.getInstance());
+  const { loading, result, run } = useAsync(dictionary.autocomplete);
 
   const [focusing, setFocusing] = useState<boolean>(false);
   const [word, setWord] = useState<string>("");
@@ -49,7 +50,7 @@ export const SearchForm = ({ value, onChange }: SearchFormProps) => {
             }}
             onFocus={() => {
               run(word);
-              setFocusing(true)
+              setFocusing(true);
             }}
             onBlur={() => setFocusing(false)}
             autoComplete="off"

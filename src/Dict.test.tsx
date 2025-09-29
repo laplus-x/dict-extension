@@ -1,15 +1,20 @@
+import { useAsync } from "@/components";
+import type { Cambridge } from "@/repositories";
+import type { Dictionary } from "@/usecases";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Err, Ok } from "ts-results";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
-import { useAsync } from "./components";
 import { Dict } from "./Dict";
 import type { DictPronProps } from "./DictPron";
 import type { DictTabsProps } from "./DictTabs";
-import type { Cambridge } from "./repositories";
 
 vi.mock("@/repositories", () => ({
-  Cambridge: vi.fn(() => mock<Cambridge>()),
+  Cambridge: { getInstance: vi.fn(() => mock<Cambridge>()) },
+}));
+
+vi.mock("@/usecases", () => ({
+  Dictionary: vi.fn(() => mock<Dictionary>()),
 }));
 
 vi.mock("@/components", async (importActual) => {

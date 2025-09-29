@@ -1,8 +1,3 @@
-
-import { boundMethod } from 'autobind-decorator';
-import { CacheManager } from './cache';
-
-
 export interface DictType {
     link: string;
     pron: Record<string, {
@@ -35,13 +30,11 @@ export interface CambridgeOptions {
     dict: string
 }
 
-
 export class Cambridge {
     private readonly BASE: string = "https://dictionary.cambridge.org";
-    private options: CambridgeOptions;
+    private readonly options: CambridgeOptions;
 
     private static instance?: Cambridge;
-    private readonly cacheManager = new CacheManager();
 
     constructor(options: CambridgeOptions = { dict: 'english-chinese-traditional' }) {
         this.options = options
@@ -129,12 +122,7 @@ export class Cambridge {
         };
     }
 
-    @boundMethod
     public async autocomplete(word: string): Promise<AutocompleteType[]> {
-        const prefix = "autocomplete:";
-        const cached = this.cacheManager.get<AutocompleteType[]>(word, { prefix });
-        if (cached) return Promise.resolve(cached);
-
         console.log("Autocompleting dictionary for:", word);
         const resp = await fetch(
             `${this.BASE}/zht/autocomplete/amp?dataset=${this.options.dict}&q=${word}`
@@ -143,17 +131,10 @@ export class Cambridge {
             throw new Error(`HTTP error! Status: ${resp.status} - ${resp.statusText}`);
         }
         const result = await resp.json()
-        this.cacheManager.set(word, result, { prefix })
         return result
     }
 
-    @boundMethod
     public async query(word: string): Promise<DictType> {
-        const prefix = "query:";
-        const cached = this.cacheManager.get<DictType>(word, { prefix });
-        if (cached) return Promise.resolve(cached);
-
-
         console.log("Querying dictionary for:", word);
         const resp = await fetch(
             `${this.BASE}/dictionary/${this.options.dict}/${word}`
@@ -161,9 +142,7 @@ export class Cambridge {
         if (!resp.ok) {
             throw new Error(`HTTP error! Status: ${resp.status} - ${resp.statusText}`);
         }
-        const html = await resp.text();
-        const result = this.parse(html);
-        this.cacheManager.set<DictType>(word, result, { prefix })
-        return result
+        const result = await resp.text();
+        return this.parse(result)
     }
 }

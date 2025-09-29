@@ -1,4 +1,5 @@
 import type { Cambridge } from "@/repositories";
+import type { Dictionary } from "@/usecases";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Ok } from "ts-results";
 import { describe, expect, it, vi } from "vitest";
@@ -6,7 +7,11 @@ import { mock } from "vitest-mock-extended";
 import { SearchForm } from "./SearchForm";
 
 vi.mock("@/repositories", () => ({
-  Cambridge: vi.fn(() => mock<Cambridge>()),
+  Cambridge: { getInstance: vi.fn(() => mock<Cambridge>()) },
+}));
+
+vi.mock("@/usecases", () => ({
+  Dictionary: vi.fn(() => mock<Dictionary>()),
 }));
 
 vi.mock("@/components", async (importActual) => {

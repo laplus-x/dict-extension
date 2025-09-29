@@ -1,5 +1,6 @@
 import { Skeleton, useAsync, useInstance } from "@/components";
 import { Cambridge } from "@/repositories";
+import { Dictionary } from "@/usecases";
 import { useEffect, useRef, useState } from "react";
 import { DictPron } from "./DictPron";
 import { DictTabs } from "./DictTabs";
@@ -9,8 +10,8 @@ export interface DictProps {
 }
 
 export const Dict = ({ text }: DictProps) => {
-  const cambridge = useInstance(Cambridge);
-  const { loading, result, run } = useAsync(cambridge.query);
+  const dictionary = useInstance(Dictionary, Cambridge.getInstance());
+  const { loading, result, run } = useAsync(dictionary.query);
 
   const ref = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
