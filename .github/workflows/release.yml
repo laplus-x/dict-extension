@@ -1,35 +1,68 @@
-name: Release
+name: Release Chrome Extension
+
 on:
-  workflow_dispatch:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  release:
+  # Build job
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      # 讀取版本號，存到 env
-      - name: Get version from package.json
-        id: get_version
-        run: |
-          NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
-          echo "NAME=$NAME" >> $GITHUB_ENV
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Not needed if lastUpdated is not enabled
 
-      # 確認檔案存在
-      - name: Check if release zip exists
-        run: |
-          ls -l release/crx-${{ env.NAME }}-${{ env.VERSION }}.zip
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest # or "latest", "canary", <sha>
 
-      # 上傳 Release 並附加指定檔案
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build with Chrome Extension
+        run: bun run build
+
+      - name: Find build artifact
+        id: find_zip
+        run: |
+          FILE=$(ls release/crx-*.zip | head -n 1)
+          echo "zip_file=$FILE" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: ${{ steps.find_zip.outputs.zip_file }}
+
+  # Release job
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension
+          path: .
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/crx-${{ env.NAME }}-${{ env.VERSION }}.zip
-          body: |
-            Release version v${{ env.VERSION }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref_name }}
+          files: crx-*.zip
