@@ -1,29 +1,16 @@
-import { useAsync } from "@/components";
-import type { Cambridge } from "@/repositories";
-import type { Dictionary } from "@/usecases";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { Err, Ok } from "ts-results";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
+import useSWR from "swr";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { Dict } from "./Dict";
 import type { DictPronProps } from "./DictPron";
 import type { DictTabsProps } from "./DictTabs";
 
-vi.mock("@/repositories", () => ({
-  Cambridge: { getInstance: vi.fn(() => mock<Cambridge>()) },
-}));
-
-vi.mock("@/usecases", () => ({
-  Dictionary: vi.fn(() => mock<Dictionary>()),
-}));
+vi.mock("swr");
 
 vi.mock("@/components", async (importActual) => {
   const actual = await importActual<Record<string, any>>();
   return {
     ...actual,
-    useAsync: vi.fn(),
-    useDebounce: (cb: any) => cb,
-    useInstance: (Cls: any) => new Cls(),
     Skeleton: () => <div data-testid="skeleton">Loading...</div>,
   };
 });
@@ -44,16 +31,14 @@ vi.mock("./DictTabs", () => ({
 }));
 
 describe("Dict", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => {});
 
   it("displays a Skeleton while data is loading", () => {
     // Given the dictionary is loading
-    vi.mocked(useAsync).mockReturnValue({
-      loading: true,
-      result: Ok(null),
-      run: vi.fn(),
+    (useSWR as Mock).mockReturnValue({
+      data: null,
+      error: null,
+      isLoading: true,
     });
 
     // When rendering the Dict component
@@ -65,10 +50,10 @@ describe("Dict", () => {
 
   it("displays an error message when the lookup fails", async () => {
     // Given the dictionary returns an error
-    vi.mocked(useAsync).mockReturnValue({
-      loading: false,
-      result: Err(new Error("Not Found")),
-      run: vi.fn(),
+    (useSWR as Mock).mockReturnValue({
+      data: null,
+      error: new Error("Not Found"),
+      isLoading: false,
     });
 
     // When rendering the Dict component
@@ -80,14 +65,14 @@ describe("Dict", () => {
 
   it("renders DictPron and DictTabs when the lookup succeeds", async () => {
     // Given the dictionary returns valid results
-    vi.mocked(useAsync).mockReturnValue({
-      loading: false,
-      result: Ok({
+    (useSWR as Mock).mockReturnValue({
+      data: {
         pron: { ipa: "/test/" },
         link: "https://example.com",
         pos: [{ pos: "noun" }, { pos: "verb" }],
-      }),
-      run: vi.fn(),
+      },
+      error: null,
+      isLoading: false,
     });
 
     // When rendering the Dict component
@@ -106,15 +91,14 @@ describe("Dict", () => {
 
   it("calls run with the provided text", async () => {
     // Given a run function mock
-    const runMock = vi.fn();
-    vi.mocked(useAsync).mockReturnValue({
-      loading: false,
-      result: Ok({
+    (useSWR as Mock).mockReturnValue({
+      data: {
         pron: {},
         link: "#",
         pos: [{ label: "adj" }],
-      }),
-      run: runMock,
+      },
+      error: null,
+      isLoading: false,
     });
 
     // When rendering Dict with a search text
@@ -122,20 +106,20 @@ describe("Dict", () => {
 
     // Then run should be called with that text
     await waitFor(() => {
-      expect(runMock).toHaveBeenCalledWith("apple");
+      expect(useSWR).toHaveBeenCalledWith(["query", "apple"], expect.any(Function));
     });
   });
 
   it("triggers handleTabClick when a tab is clicked", async () => {
     // Given the dictionary returns a result with one tab
-    vi.mocked(useAsync).mockReturnValue({
-      loading: false,
-      result: Ok({
+    (useSWR as Mock).mockReturnValue({
+      data: {
         pron: {},
         link: "#",
         pos: [{ label: "adj" }],
-      }),
-      run: vi.fn(),
+      },
+      error: null,
+      isLoading: false,
     });
 
     // When the user clicks a tab

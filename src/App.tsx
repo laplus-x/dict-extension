@@ -4,7 +4,7 @@ import { SearchForm } from "./SearchForm";
 
 export const App = () => {
   const [visible, setVisible] = useState<boolean>(false);
-  const [text, setText] = useState<string>("");
+  const [text, setText] = useState<string>();
 
   useEffect(() => {
     const port = chrome.runtime.connect({ name: "popup" });
@@ -12,7 +12,7 @@ export const App = () => {
     const handle = (msg: Record<string, any>) => {
       console.log("Received message:", msg);
       if (msg.type === "QUERY") {
-        setText(msg.text ?? "");
+        setText(msg.text);
       } else if (msg.type === "VISIBLE") {
         setVisible(msg.visible ?? false);
       }
@@ -29,7 +29,7 @@ export const App = () => {
   return (
     <div className="font-sans min-w-[400px] min-h-[300px] w-full h-svh bg-[#343a40] text-white overflow-hidden">
       <SearchForm value={text} onChange={setText} />
-      <Dict text={visible ? text : ""} />
+      <Dict text={visible ? text : undefined} />
     </div>
   );
 };

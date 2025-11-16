@@ -7,7 +7,7 @@ export interface DictTabsProps {
   onTabClick: (idx: number) => void;
 }
 
-export const DictTabs = ({ items, activeTab, onTabClick }: DictTabsProps) => {
+export const DictTabs: React.FC<DictTabsProps> = ({ items, activeTab, onTabClick }) => {
   const item = useMemo(() => items.at(activeTab), [items, activeTab]);
 
   return (

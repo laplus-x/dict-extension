@@ -1,22 +1,34 @@
-import { useAsync, useDebounce, useInstance } from "@/components";
+import {
+  useBoolean,
+  useDebounce,
+  useDebouncedValue,
+  useInstance,
+} from "@/components";
 import { Cambridge } from "@/repositories";
 import { Dictionary } from "@/usecases";
 import { useEffect, useState, type FormEventHandler } from "react";
+import useSWR from "swr";
 
 export interface SearchFormProps {
-  value: string;
-  onChange: (value: string) => void;
+  value?: string;
+  onChange: (value?: string) => void;
 }
 
-export const SearchForm = ({ value, onChange }: SearchFormProps) => {
+export const SearchForm: React.FC<SearchFormProps> = ({ value = "", onChange }) => {
   const dictionary = useInstance(Dictionary, Cambridge.getInstance());
-  const { loading, result, run } = useAsync(dictionary.autocomplete);
 
-  const [focusing, setFocusing] = useState<boolean>(false);
-  const [word, setWord] = useState<string>("");
+  const [focusing, { setFalse: setUnfocusing, setTrue: setFocusing }] =
+    useBoolean(false);
+  const [word, setWord] = useState<string>(value);
 
-  const debounceChange = useDebounce(onChange, { delay: 200 });
-  const debounceAutocomplete = useDebounce(run, { delay: 500 });
+  const debounceChange = useDebounce(onChange, { delay: 500 });
+
+  const debouncedWord = useDebouncedValue(word, { delay: 200 });
+  const shouldSearch = focusing && debouncedWord.trim().length > 1;
+  const { data, error, isLoading } = useSWR(
+    shouldSearch ? ["autocomplete", debouncedWord] : null,
+    ([_, ...args]) => dictionary.autocomplete(...args)
+  );
 
   useEffect(() => {
     setWord(value);
@@ -29,7 +41,7 @@ export const SearchForm = ({ value, onChange }: SearchFormProps) => {
 
   const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    setFocusing(false);
+    setUnfocusing();
   };
 
   return (
@@ -45,14 +57,10 @@ export const SearchForm = ({ value, onChange }: SearchFormProps) => {
             placeholder="Enter a text to search"
             value={word}
             onChange={(e) => {
-              debounceAutocomplete(e.target.value);
               setWord(e.target.value);
             }}
-            onFocus={() => {
-              run(word);
-              setFocusing(true);
-            }}
-            onBlur={() => setFocusing(false)}
+            onFocus={setFocusing}
+            onBlur={setUnfocusing}
             autoComplete="off"
           />
           {word && (
@@ -79,13 +87,16 @@ export const SearchForm = ({ value, onChange }: SearchFormProps) => {
           )}
         </div>
       </form>
-      {focusing && !loading && result && result.ok && (
+      {focusing && !isLoading && error && (
+        <p className="text-red-500">{error.message}</p>
+      )}
+      {focusing && !isLoading && data && (
         <div className="absolute z-10 w-full bg-white text-black rounded-b shadow max-h-[50%] overflow-y-auto">
-          {result.val.map((i) => (
+          {data.map((i) => (
             <button
               key={i.word}
               className="w-full text-left px-3 py-2 hover:bg-amber-100"
-              onMouseDown={() => setWord(i.word)}
+              onPointerDown={() => setWord(i.word)}
             >
               {i.word}
             </button>

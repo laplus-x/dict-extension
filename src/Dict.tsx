@@ -1,7 +1,8 @@
-import { Skeleton, useAsync, useInstance } from "@/components";
+import { Skeleton, useInstance } from "@/components";
 import { Cambridge } from "@/repositories";
 import { Dictionary } from "@/usecases";
 import { useEffect, useRef, useState } from "react";
+import useSWR from "swr";
 import { DictPron } from "./DictPron";
 import { DictTabs } from "./DictTabs";
 
@@ -9,24 +10,26 @@ export interface DictProps {
   text?: string;
 }
 
-export const Dict = ({ text }: DictProps) => {
+export const Dict: React.FC<DictProps> = ({ text = "" }: DictProps) => {
   const dictionary = useInstance(Dictionary, Cambridge.getInstance());
-  const { loading, result, run } = useAsync(dictionary.query);
+  const shouldQuery = text.trim().length > 1;
+  const { data, error, isLoading } = useSWR(
+    shouldQuery ? ["query", text] : null,
+    ([_, ...args]) => dictionary.query(...args)
+  );
 
   const ref = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
 
   useEffect(() => {
     if (!text) return;
-    run(text);
     handleTabClick(0);
   }, [text]);
 
   const handleTabClick = (pos: number) => {
     setActiveTab(pos);
-    if (ref.current) {
-      ref.current.scrollTop = 0;
-    }
+    if (!ref.current) return;
+    ref.current.scrollTop = 0;
   };
 
   return (
@@ -35,15 +38,13 @@ export const Dict = ({ text }: DictProps) => {
       className="p-4 overflow-y-auto"
       style={{ maxHeight: "calc(100svh - 50px)" }}
     >
-      {loading && <Skeleton />}
-      {!loading && result && !result.ok && (
-        <p className="text-red-500">{result.val.message}</p>
-      )}
-      {!loading && result && result.ok && (
+      {isLoading && <Skeleton />}
+      {!isLoading && error && <p className="text-red-500">{error.message}</p>}
+      {!isLoading && data && (
         <>
           <div className="flex justify-between w-full">
-            <DictPron data={result.val.pron} />
-            <a href={result.val.link} target="_blank" rel="noopener noreferrer">
+            <DictPron data={data.pron} />
+            <a href={data.link} target="_blank" rel="noopener noreferrer">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-6 h-6"
@@ -64,7 +65,7 @@ export const Dict = ({ text }: DictProps) => {
           </div>
           <DictTabs
             activeTab={activeTab}
-            items={result.val.pos}
+            items={data.pos}
             onTabClick={handleTabClick}
           />
         </>

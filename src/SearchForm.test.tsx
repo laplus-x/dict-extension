@@ -1,34 +1,18 @@
-import type { Cambridge } from "@/repositories";
-import type { Dictionary } from "@/usecases";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { Ok } from "ts-results";
-import { describe, expect, it, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
+import useSWR from "swr";
+import { describe, expect, it, vi, type Mock } from "vitest";
 import { SearchForm } from "./SearchForm";
 
-vi.mock("@/repositories", () => ({
-  Cambridge: { getInstance: vi.fn(() => mock<Cambridge>()) },
-}));
-
-vi.mock("@/usecases", () => ({
-  Dictionary: vi.fn(() => mock<Dictionary>()),
-}));
-
-vi.mock("@/components", async (importActual) => {
-  const actual = await importActual<Record<string, any>>();
-  return {
-    ...actual,
-    useAsync: (fn: any) => ({
-      loading: false,
-      result: Ok([{ word: "mockedWord" }]),
-      run: vi.fn(fn),
-    }),
-    useDebounce: (cb: any) => cb,
-    useInstance: (Cls: any) => new Cls(),
-  };
-});
+vi.mock("swr");
 
 describe("SearchForm", () => {
+  beforeEach(() => {
+    (useSWR as Mock).mockReturnValue({
+      data: [{ word: "mockedWord" }],
+      error: null,
+    });
+  });
+
   it("should render input with the initial value", () => {
     // Given the SearchForm is rendered with a value "hello"
     render(<SearchForm value="hello" onChange={vi.fn()} />);
@@ -81,13 +65,13 @@ describe("SearchForm", () => {
 
   it("should fill input with suggestion text when suggestion is selected", async () => {
     // Given SearchForm with value "try"
-    render(<SearchForm value="try" onChange={vi.fn()} />);
+    render(<SearchForm value="mockedWord" onChange={vi.fn()} />);
     const input = screen.getByPlaceholderText(/enter a text/i);
 
     // When input gains focus and user clicks on suggestion "mockedWord"
     fireEvent.focus(input);
     const suggestion = await screen.findByText("mockedWord");
-    fireEvent.mouseDown(suggestion);
+    fireEvent.pointerDown(suggestion);
 
     // Then input value is updated to the selected suggestion
     expect(input).toHaveValue("mockedWord");

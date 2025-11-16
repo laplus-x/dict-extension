@@ -4,7 +4,7 @@ export interface DictPronProps {
   data: DictType["pron"];
 }
 
-export const DictPron = ({ data }: DictPronProps) => {
+export const DictPron: React.FC<DictPronProps> = ({ data }) => {
   const playAudio = (url?: string) => {
     if (!url) return;
     new Audio(url).play();
