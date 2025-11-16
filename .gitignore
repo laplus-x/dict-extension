@@ -1,5 +1,8 @@
-# Output
+# Build artifacts
 dist
+dist-ssr
+release
+.inspect
 
 # Logs
 logs
@@ -10,9 +13,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependency
 node_modules
-dist
-dist-ssr
+
+# Config
 *.local
 
 # Editor directories and files

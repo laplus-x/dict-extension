@@ -26,8 +26,10 @@
   },
   "dependencies": {
     "autobind-decorator": "^2.4.0",
+    "es-toolkit": "^1.41.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "swr": "^2.3.6",
     "tailwindcss": "^4.1.11",
     "ts-results": "^3.3.0",
     "ts-toolbelt": "^9.6.0"
@@ -52,6 +54,8 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
     "vite": "^7.0.4",
+    "vite-bundle-analyzer": "^1.2.3",
+    "vite-plugin-inspect": "^11.3.3",
     "vite-plugin-zip-pack": "^1.2.4",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
