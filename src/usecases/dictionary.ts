@@ -20,7 +20,7 @@ export class Dictionary {
     public async autocomplete(word: string): Promise<AutocompleteType[]> {
         const prefix = "autocomplete:";
         const cached = this.cacheManager.get<AutocompleteType[]>(word, { prefix });
-        if (cached) return Promise.resolve(cached);
+        if (cached) return cached;
 
         const result = await this.cambridge.autocomplete(word)
         this.cacheManager.set(word, result, { prefix })
@@ -31,7 +31,7 @@ export class Dictionary {
     public async query(word: string): Promise<DictType> {
         const prefix = "query:";
         const cached = this.cacheManager.get<DictType>(word, { prefix });
-        if (cached) return Promise.resolve(cached);
+        if (cached) return cached;
 
         const result = await this.cambridge.query(word)
         this.cacheManager.set<DictType>(word, result, { prefix })
