@@ -1,12 +1,11 @@
 import {
   useBoolean,
-  useDebounce,
   useDebouncedValue,
-  useInstance,
+  useInstance
 } from "@/components";
 import { Cambridge } from "@/repositories";
 import { Dictionary } from "@/usecases";
-import { useEffect, useState, type FormEventHandler } from "react";
+import { type FormEventHandler } from "react";
 import useSWR from "swr";
 
 export interface SearchFormProps {
@@ -19,25 +18,13 @@ export const SearchForm: React.FC<SearchFormProps> = ({ value = "", onChange }) 
 
   const [focusing, { setFalse: setUnfocusing, setTrue: setFocusing }] =
     useBoolean(false);
-  const [word, setWord] = useState<string>(value);
 
-  const debounceChange = useDebounce(onChange, { delay: 500 });
-
-  const debouncedWord = useDebouncedValue(word, { delay: 200 });
+  const debouncedWord = useDebouncedValue(value, { delay: 250 });
   const shouldSearch = focusing && debouncedWord.trim().length > 1;
   const { data, error, isLoading } = useSWR(
     shouldSearch ? ["autocomplete", debouncedWord] : null,
     ([_, ...args]) => dictionary.autocomplete(...args)
   );
-
-  useEffect(() => {
-    setWord(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (!word) return;
-    debounceChange(word);
-  }, [word]);
 
   const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
@@ -55,19 +42,19 @@ export const SearchForm: React.FC<SearchFormProps> = ({ value = "", onChange }) 
             className="w-full text-lg border-b border-white focus:outline-none"
             name="text"
             placeholder="Enter a text to search"
-            value={word}
+            value={value}
             onChange={(e) => {
-              setWord(e.target.value);
+              onChange(e.target.value);
             }}
             onFocus={setFocusing}
             onBlur={setUnfocusing}
             autoComplete="off"
           />
-          {word && (
+          {value && (
             <button
               type="button"
               className="cursor-pointer"
-              onClick={() => setWord("")}
+              onClick={() => onChange()}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +83,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({ value = "", onChange }) 
             <button
               key={i.word}
               className="w-full text-left px-3 py-2 hover:bg-amber-100"
-              onPointerDown={() => setWord(i.word)}
+              onPointerDown={() => onChange(i.word)}
             >
               {i.word}
             </button>

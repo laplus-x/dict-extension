@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Dict } from "./Dict";
 import { SearchForm } from "./SearchForm";
+import type { Optional } from "./types";
 
 export const App = () => {
   const [visible, setVisible] = useState<boolean>(false);
-  const [text, setText] = useState<string>();
+  const [text, setText] = useState<Optional<string>>(undefined);
 
   useEffect(() => {
     const port = chrome.runtime.connect({ name: "popup" });

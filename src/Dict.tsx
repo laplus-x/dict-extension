@@ -1,4 +1,4 @@
-import { Skeleton, useInstance } from "@/components";
+import { Skeleton, useDebouncedValue, useInstance } from "@/components";
 import { Cambridge } from "@/repositories";
 import { Dictionary } from "@/usecases";
 import { useEffect, useRef, useState } from "react";
@@ -11,10 +11,11 @@ export interface DictProps {
 }
 
 export const Dict: React.FC<DictProps> = ({ text = "" }: DictProps) => {
+  const debouncedText = useDebouncedValue(text, { delay: 500 });
   const dictionary = useInstance(Dictionary, Cambridge.getInstance());
-  const shouldQuery = text.trim().length > 1;
+  const shouldQuery = debouncedText.trim().length > 1;
   const { data, error, isLoading } = useSWR(
-    shouldQuery ? ["query", text] : null,
+    shouldQuery ? ["query", debouncedText] : null,
     ([_, ...args]) => dictionary.query(...args)
   );
 
@@ -22,9 +23,9 @@ export const Dict: React.FC<DictProps> = ({ text = "" }: DictProps) => {
   const [activeTab, setActiveTab] = useState<number>(0);
 
   useEffect(() => {
-    if (!text) return;
+    if (!debouncedText) return;
     handleTabClick(0);
-  }, [text]);
+  }, [debouncedText]);
 
   const handleTabClick = (pos: number) => {
     setActiveTab(pos);
