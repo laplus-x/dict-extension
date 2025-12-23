@@ -96,7 +96,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
             <button
               type="button"
               className="cursor-pointer"
-              onClick={() => onChange()}
+              onClick={() => onChange(undefined)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

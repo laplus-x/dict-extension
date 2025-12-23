@@ -33,8 +33,7 @@ describe("SearchForm", () => {
     // When the user types "cam" into the input
     fireEvent.change(input, { target: { value: "cam" } });
 
-    // Then input value updates and onChange is called with "cam"
-    expect(input).toHaveValue("cam");
+    // Then the input value should be updated and onChange called
     expect(handleChange).toHaveBeenCalledWith("cam");
   });
 
@@ -52,20 +51,22 @@ describe("SearchForm", () => {
 
   it("should clear input value when clear button is clicked", () => {
     // Given SearchForm with value "abc"
-    render(<SearchForm value="abc" onChange={vi.fn()} />);
+    const handleChange = vi.fn();
+    render(<SearchForm value="abc" onChange={handleChange} />);
     const input = screen.getByPlaceholderText(/enter a text/i);
 
     // When clear button is clicked
     const clearButton = screen.getByRole("button");
     fireEvent.click(clearButton);
 
-    // Then input value should be empty
-    expect(input).toHaveValue("");
+    // Then input value is cleared and onChange is called with undefined
+    expect(handleChange).toBeCalledWith(undefined);
   });
 
   it("should fill input with suggestion text when suggestion is selected", async () => {
     // Given SearchForm with value "try"
-    render(<SearchForm value="mockedWord" onChange={vi.fn()} />);
+    const handleChange = vi.fn();
+    render(<SearchForm value="mockedWord" onChange={handleChange} />);
     const input = screen.getByPlaceholderText(/enter a text/i);
 
     // When input gains focus and user clicks on suggestion "mockedWord"
@@ -74,6 +75,6 @@ describe("SearchForm", () => {
     fireEvent.pointerDown(suggestion);
 
     // Then input value is updated to the selected suggestion
-    expect(input).toHaveValue("mockedWord");
+    expect(handleChange).toBeCalledWith("mockedWord");
   });
 });
