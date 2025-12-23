@@ -5,11 +5,22 @@
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
-  transition: background 0.3s;
 }
 *:hover::-webkit-scrollbar-thumb,
 *:active::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.autocomplete::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+.autocomplete::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+.autocomplete:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.6);
 }
