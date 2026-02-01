@@ -14,9 +14,6 @@ export default defineManifest({
     },
     default_popup: 'index.html',
   },
-  background: {
-    service_worker: "src/background/main.ts"
-  },
   content_scripts: [{
     js: ['src/content/main.ts'],
     matches: [

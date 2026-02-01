@@ -1,26 +1,49 @@
+import type { Nullable } from "@/types";
+import tippy from "tippy.js";
+
 const old = document.getElementById("dict-ext-popup");
 if (old) old.remove();
 
 const popup = document.createElement("div");
 popup.id = "dict-ext-popup";
-popup.style.position = "absolute";
-popup.style.zIndex = "2147483647";
-popup.style.display = "none";
+popup.style.all = "initial";
 document.documentElement.appendChild(popup);
 
 const shadow = popup.attachShadow({ mode: "open" });
 
+const style = document.createElement("style");
+style.textContent = `
+  .btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #fff;
+    background: #343a40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .iframe {
+    border: none;
+    min-width: 400px;
+    min-height: 300px;
+    border-radius: 8px;
+  }
+`;
+shadow.appendChild(style);
+
+const root = document.createElement("div");
+root.style.position = "fixed";
+root.style.top = "0";
+root.style.left = "0";
+root.style.zIndex = "2147483647";
+shadow.appendChild(root);
+
+// 搜尋按鈕
 const btn = document.createElement("div");
-btn.style.width = "36px";
-btn.style.height = "36px";
-btn.style.borderRadius = "50%";
-btn.style.color = "#fff";
-btn.style.background = "#343a40";
-btn.style.display = "flex";
-btn.style.alignItems = "center";
-btn.style.justifyContent = "center";
-btn.style.cursor = "pointer";
-btn.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+btn.className = "btn";
 btn.innerHTML = `
   <svg xmlns="http://www.w3.org/2000/svg" 
        width="16" height="16" viewBox="0 0 24 24" fill="none" 
@@ -29,91 +52,69 @@ btn.innerHTML = `
     <line x1="21" y1="21" x2="16.65" y2="16.65"/>
   </svg>
 `;
-shadow.appendChild(btn);
 
+// 字典UI
 const iframe = document.createElement("iframe");
 iframe.src = chrome.runtime.getURL("index.html");
-iframe.style.position = "absolute";
-iframe.style.zIndex = "2147483647";
-iframe.style.border = "none";
-iframe.style.minWidth = "400px";
-iframe.style.minHeight = "300px";
-iframe.style.borderRadius = "8px";
-iframe.style.display = "none";
-shadow.appendChild(iframe);
+iframe.className = "iframe";
 
-function getPopupBounds(rect: DOMRect, width: number, height: number, margin: number) {
-  let left = rect.left + window.scrollX;
-  let top = rect.bottom + window.scrollY + margin;
+// 浮動按鈕
+const btnTip = tippy(root, {
+  content: btn,
+  allowHTML: true,
+  interactive: true,
+  appendTo: () => root,
+  trigger: "manual",
+  placement: "bottom-start",
+  maxWidth: "none",
+  offset: [8, 8],
+});
 
-  // 右邊界檢查
-  if (left + width > window.innerWidth) {
-    left = window.innerWidth - width - margin;
-  }
+let lastText: Nullable<string>;
+let lastRect: Nullable<DOMRect>;
 
-  // 底部檢查
-  if (top + height > window.innerHeight + window.scrollY) {
-    top = rect.top + window.scrollY - height - margin;
-  }
+// 浮動字典
+const dictTip = tippy(root, {
+  content: iframe,
+  allowHTML: true,
+  interactive: true,
+  appendTo: () => root,
+  trigger: "manual",
+  placement: "bottom-start",
+  maxWidth: "none",
+});
 
-  // 左邊界檢查
-  if (left < margin) {
-    left = margin;
-  }
+// 點擊按鈕 → 顯示字典 iframe
+btn.addEventListener("click", () => {
+  btnTip.hide();
 
-  // 上邊界檢查
-  if (top < margin + window.scrollY) {
-    top = rect.bottom + window.scrollY + margin; // fallback
-  }
+  iframe.src = chrome.runtime.getURL(`index.html?text=${encodeURIComponent(lastText!)}`);
+  dictTip.setProps({
+    getReferenceClientRect: () => lastRect!,
+  });
+  dictTip.show();
+});
 
-  return { left, top };
-}
-
-btn.onclick = () => {
-  btn.style.display = "none";
-  iframe.style.display = "block";
-
-  const rect = popup.getBoundingClientRect();
-  const margin = 5;
-  const width = 450;
-  const height = 350;
-
-  const { left, top } = getPopupBounds(rect, width, height, margin);
-
-  popup.style.left = `${left}px`;
-  popup.style.top = `${top}px`;
-
-  chrome.runtime.sendMessage({ type: "VISIBLE", visible: true });
-};
-
+// 清除顯示按鈕以及字典 iframe
 function clear() {
-  popup.style.display = "none";
-  iframe.style.display = "none";
-  btn.style.display = "flex";
-  chrome.runtime.sendMessage({ type: "VISIBLE", visible: false });
+  btnTip.hide();
+  dictTip.hide();
 }
 
-document.addEventListener("mouseup", (e) => {
-  if (popup.contains(e.target as Node)) return;
-
+// 選取文字 → 顯示按鈕
+document.addEventListener("mouseup", () => {
   const selection = window.getSelection();
-  if (!selection) return clear()
+  if (!selection || selection.isCollapsed) return clear();
 
-  const text = selection?.toString().trim();
-  if (!text) return clear()
+  const text = selection.toString().trim();
+  if (!text) return clear();
+  lastText = text;
 
   const range = selection.getRangeAt(0);
   const rect = range.getBoundingClientRect();
-  const margin = 5;
-  const width = 36;
-  const height = 36;
-
-  const { left, top } = getPopupBounds(rect, width, height, margin);
-
-  popup.style.left = `${left}px`;
-  popup.style.top = `${top}px`;
-
-  popup.style.display = "block";
-
-  chrome.runtime.sendMessage({ type: "QUERY", text });
+  lastRect = rect;
+  btnTip.setProps({
+    getReferenceClientRect: () => rect,
+  });
+  btnTip.show();
 });
