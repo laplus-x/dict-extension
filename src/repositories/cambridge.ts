@@ -110,7 +110,7 @@ export class Cambridge {
         pron.us.audio = pron.us.audio ? this.BASE + pron.us.audio : "";
 
         const pos: DictPosType[] = [];
-        doc.querySelectorAll(".pos-body").forEach(ele => {
+        doc.querySelectorAll(".pos-body .dsense").forEach(ele => {
             const data = this.parsePos(ele)
             pos.push(data)
         })

@@ -2,9 +2,10 @@ import { Skeleton, useDebouncedValue, useInstance } from "@/components";
 import { Cambridge } from "@/repositories";
 import { Dictionary } from "@/usecases";
 import { useEffect, useRef, useState } from "react";
+import { HiOutlineExternalLink } from "react-icons/hi";
 import useSWR from "swr";
 import { DictPron } from "./DictPron";
-import { DictTabs } from "./DictTabs";
+import { DictTab } from "./DictTab";
 
 export interface DictProps {
   text?: string;
@@ -46,25 +47,10 @@ export const Dict: React.FC<DictProps> = ({ text = "" }: DictProps) => {
           <div className="flex justify-between w-full">
             <DictPron data={data.pron} />
             <a href={data.link} target="_blank" rel="noopener noreferrer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M18 13v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h6"
-                />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
+              <HiOutlineExternalLink className="w-6 h-6" />
             </a>
           </div>
-          <DictTabs
+          <DictTab
             activeTab={activeTab}
             items={data.pos}
             onTabClick={handleTabClick}

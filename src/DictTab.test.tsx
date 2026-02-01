@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { DictTabs, type DictTabsProps } from "./DictTabs";
+import { DictTab, type DictTabProps } from "./DictTab";
 
-const mockPosData: DictTabsProps["items"] = [
+const mockPosData: DictTabProps["items"] = [
   {
     pos: "noun",
     definitions: [
@@ -17,10 +17,10 @@ const mockPosData: DictTabsProps["items"] = [
   },
 ];
 
-describe("DictTabs", () => {
+describe("DictTab", () => {
   it("should render part of speech, definition, translation, and examples", () => {
     // Given a set of dictionary items
-    render(<DictTabs items={mockPosData} activeTab={0} onTabClick={vi.fn()} />);
+    render(<DictTab items={mockPosData} activeTab={0} onTabClick={vi.fn()} />);
 
     // Then part of speech, definitions, and examples should be displayed
     expect(screen.getByText("noun")).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe("DictTabs", () => {
     // Given a mock onTabClick handler
     const handleClick = vi.fn();
     render(
-      <DictTabs items={mockPosData} activeTab={0} onTabClick={handleClick} />
+      <DictTab items={mockPosData} activeTab={0} onTabClick={handleClick} />
     );
 
     // When the tab button is clicked

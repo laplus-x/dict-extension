@@ -3,7 +3,7 @@ import useSWR from "swr";
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { Dict } from "./Dict";
 import type { DictPronProps } from "./DictPron";
-import type { DictTabsProps } from "./DictTabs";
+import type { DictTabProps } from "./DictTab";
 
 vi.mock("swr");
 
@@ -21,8 +21,8 @@ vi.mock("./DictPron", () => ({
   ),
 }));
 
-vi.mock("./DictTabs", () => ({
-  DictTabs: ({ items, onTabClick }: DictTabsProps) => (
+vi.mock("./DictTab", () => ({
+  DictTab: ({ items, onTabClick }: DictTabProps) => (
     <div>
       <p data-testid="dict-tabs">{items.map((i) => i.pos).join(",")}</p>
       <button onClick={() => onTabClick(1)}>Switch Tab</button>
@@ -63,7 +63,7 @@ describe("Dict", () => {
     expect(screen.getByText("Not Found")).toBeInTheDocument();
   });
 
-  it("renders DictPron and DictTabs when the lookup succeeds", async () => {
+  it("renders DictPron and DictTab when the lookup succeeds", async () => {
     // Given the dictionary returns valid results
     (useSWR as Mock).mockReturnValue({
       data: {
@@ -78,7 +78,7 @@ describe("Dict", () => {
     // When rendering the Dict component
     render(<Dict text="hello" />);
 
-    // Then DictPron and DictTabs should be displayed
+    // Then DictPron and DictTab should be displayed
     expect(screen.getByTestId("dict-pron")).toBeInTheDocument();
     expect(screen.getByTestId("dict-tabs")).toHaveTextContent("noun,verb");
 
