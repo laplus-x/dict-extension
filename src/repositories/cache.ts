@@ -1,3 +1,4 @@
+
 export interface CacheEntry<T> {
     value: T;
     expireAt: number;
@@ -6,16 +7,17 @@ export interface CacheEntry<T> {
 export interface CacheManagerOptions {
     ttl: number;
     maxSize: number;
-    prefix?: string;
+    prefix: string;
 }
 
 export class CacheManager {
     private static instance: CacheManager;
     private readonly cache = new Map<string, CacheEntry<any>>();
-    private options: CacheManagerOptions;
+    private readonly options: CacheManagerOptions;
 
-    constructor(options: CacheManagerOptions = { ttl: 5 * 60 * 1000, maxSize: 100 }) {
-        this.options = options
+    constructor(options: Partial<CacheManagerOptions> = {}) {
+        const { ttl = 5 * 60 * 1000, maxSize = 100, prefix = "default" } = options
+        this.options = { ttl, maxSize, prefix }
     }
 
     public static getInstance(options?: CacheManagerOptions): CacheManager {
